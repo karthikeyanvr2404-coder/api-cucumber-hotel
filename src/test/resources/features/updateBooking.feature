@@ -1,69 +1,87 @@
 Feature: Update Booking API
 
-
   Background:
     Given Booking API endpoint is available
     And booking exists
 
 
- #POSITIVE
-  @regression
-  @positive
+  # POSITIVE SCENARIOS FOR UPDATE VALID BOOKING AND ROOM
+
+  @regression @updateBookingValid
   Scenario: Update booking successfully
     Given user is authenticated
     When user updates booking
     Then response status code should be 200
 
- @positive @room
-   Scenario: Update booking room number
-     Given user is authenticated
-     When user updates booking room to "105"
-     Then response status code  should be 200
 
- #NEGATIVE
+  @updateBookingRoomValid
+  Scenario Outline: Update booking room number
+    Given user is authenticated
+    When user updates booking room to "<room>"
+    Then response status code should be 200
 
-  @negative @room
-    Scenario: Update booking with invalid room
-      Given user is authenticated
-      When user updates booking room to "ABC"
-      Then response status code should be 400
+    Examples:
+      | room |
+      | 101 |
+      | 105 |
 
-  #ERROR VALIDATION
 
-  @errorValidation @room
-    Scenario: Validate invalid room update error
-       Given user is authenticated
-       When user updates booking room to "ABC"
-       Then response status code should be 400
-       And error message should contain "room"
+  # NEGATIVE SCENARIOS FOR INVALID BOOKING
 
-  #SCHEMA VALIDATION
+  @updateBookingRoomInvalid
+  Scenario Outline: Update booking with invalid room
+    Given user is authenticated
+    When user updates booking room to "<room>"
+    Then response status code should be 400
 
-  @schema @room
-    Scenario: Validate update schema with room
-       Given user is authenticated
-       When user updates booking room to "101"
-       Then response should match booking schema
+    Examples:
+      | room |
+      | ABC |
+      | -1  |
 
-  #HEADER VALIDATION
 
-  @headers
-  Scenario: Validate headers for update booking
+  # ERROR VALIDATION FOR INVALID ROOM UPDATE
+
+  @updateBookingErrorMessage
+  Scenario: Validate invalid room update error
+    Given user is authenticated
+    When user updates booking room to "ABC"
+    Then response status code should be 400
+    And error message should contain "room"
+
+
+  # SCHEMA VALIDATION FOR UPDATE BOOKING SCHEMA
+
+  @schemaValidation @updateBookingSchema
+  Scenario: Validate update booking schema
+
+    Given user is authenticated
+    When user updates booking
+    Then response should match booking schema
+
+
+  # HEADER VALIDATION FOR UPDATE BOOKING
+
+  @headerValidation @updateBookingHeaders
+  Scenario: Validate update booking headers
+
     Given user is authenticated
     When user updates booking
     Then response header "Content-Type" should be "application/json"
 
-  #RESPONSE TIME VALIDATION
 
-  @performance
+  # PERFORMANCE VALIDATION UPDATE BOOKING RESPONSE TIME
+
+  @performance @updateBookingPerformance
   Scenario: Validate update booking response time
     Given user is authenticated
     When user updates booking
     Then response time should be less than 2000 ms
 
- #DATA VALIDATION
 
-  @dataValidation
+  # DATA VALIDATION WITH UPDATED BOOKING DATA
+
+  @dataValidation @updateBookingData
   Scenario: Validate updated booking data
     Given user is authenticated
     When user updates booking
@@ -71,10 +89,12 @@ Feature: Update Booking API
     And lastname should match request
     And totalprice should match request
 
- #CONTRACT VALIDATION
 
-  @contract
+  # CONTRACT VALIDATION WITH UPDATE BOOKING
+
+  @contractValidation @updateBookingContract
   Scenario: Validate update booking contract
+
     Given user is authenticated
     When user updates booking
     Then response should contain field "firstname"

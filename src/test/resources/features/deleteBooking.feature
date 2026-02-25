@@ -1,64 +1,51 @@
-  Feature: Delete Booking API
+Feature: Delete Booking API
 
-    Background:
-      Given Booking API endpoint is available
-      And booking exists
-
-  #POSITIVE
-    @regression
-    @positive
-    Scenario: Delete booking successfully
-      Given user is authenticated
-      When user deletes booking
-      Then response status code should be 201
+  Background:
+    Given Booking API endpoint is available
+    And booking exists
 
 
+  # POSITIVE SCENARIOS FOR DELETE BOOKING
 
-    @positive @room
-    Scenario: Delete room booking
-      Given user is authenticated
-      And booking exists
-      When user deletes booking
-      Then response status code should be 201
-
-  #NEGATIVE
-
-    @negative @room
-     Scenario: Delete non existing room booking
-      Given user is authenticated
-      When user deletes non existing booking
-      Then response status code should be 404
-
-  #ERROR VALIDATION
-
-    @errorValidation @room
-      Scenario: Validate room delete error
-      Given user is authenticated
-      When user deletes non existing booking
-      Then response status code should be 404
-      And error message should contain "Not Found"
+  @regression @deleteBookingValid
+  Scenario: Delete booking successfully
+    Given user is authenticated
+    When user deletes booking
+    Then response status code should be 201
 
 
-  #HEADER VALIDATION
+  # NEGATIVE SCENARIOS FOR NON-EXISTING BOOKING
 
-    @headers
-    Scenario: Validate headers for delete booking
-      Given user is authenticated
-      When user deletes booking
-      Then response header "Content-Type" should be "text/plain"
+  @deleteBookingNotFound
+  Scenario: Delete non-existing booking
+    Given user is authenticated
+    When user deletes non existing booking
+    Then response status code should be 404
 
-  #RESPONSE TIME VALIDATION
 
-    @performance
-    Scenario: Validate delete booking response time
-      Given user is authenticated
-      When user deletes booking
-      Then response time should be less than 2000 ms
+  # ERROR VALIDATION FOR DELETE BOOKING
 
-  #CONTRACT VALIDATION
+  @deleteBookingErrorMessage
+  Scenario: Validate delete booking error
+    Given user is authenticated
+    When user deletes non existing booking
+    Then response status code should be 404
+    And error message should contain "Not Found"
 
-    @performance
-    Scenario: Validate delete booking response time
-      Given user is authenticated
-      When user deletes booking
-      Then response time should be less than 2000 ms
+
+  # HEADER VALIDATION FOR DELETE BOOKING
+
+  @headerValidation @deleteBookingHeaders
+  Scenario: Validate delete booking headers
+    Given user is authenticated
+    When user deletes booking
+    Then response header "Content-Type" should be "text/plain"
+
+
+  # PERFORMANCE VALIDATION FOR DELETE BOOKING RESPONSE TIME
+
+  @performance @deleteBookingPerformance
+  Scenario: Validate delete booking response time
+    Given user is authenticated
+    When user deletes booking
+    Then response time should be less than 2000 ms

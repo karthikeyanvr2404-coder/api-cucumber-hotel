@@ -1,90 +1,80 @@
 Feature: Exploratory Testing for Booking and Room APIs
 
   As an API user
-  I want to exploratory testing
-  So that I can access some extraordinary unexpected values
+  I want to perform exploratory testing
+  So that unexpected system behaviors can be identified
+
 
   Background:
     Given Booking API endpoint is available
     And request content type is "application/json"
 
 
-  @exploratory @booking
-  Scenario: Create booking with extremely long values
-    When User creates booking with very large text values
-    Then Status code should be 400 or 500
+  # BOOKING EXPLORATORY TESTS WITH UNUSUAL INPUT VALUES
+
+  @exploratoryLargePayload
+  Scenario Outline: Create booking with unusual input values
+    When user creates booking with "<inputType>" values
+    Then response status code should be <status>
+
+    Examples:
+      | inputType            | status |
+      | very large text      | 400    |
+      | special characters   | 400    |
+      | null values          | 400    |
+      | numeric firstname    | 200    |
 
 
 
-  @exploratory @booking
-  Scenario: Create booking with special characters
-    When User creates booking with special characters
-    Then Status code should be 400 or 201
+  # INVALID REQUEST TESTS WITH INVALID REQUEST BODY
+
+  @exploratoryInvalidBody
+  Scenario Outline: Create booking with invalid request body
+    When user sends "<requestType>" booking request
+    Then response status code should be 400
+
+    Examples:
+      | requestType     |
+      | empty           |
+      | invalid JSON    |
 
 
 
-  @exploratory @booking
-  Scenario: Create booking with numeric values in name
-    When User creates booking with numeric firstname
-    Then Status code should be validated
+  # ROOM EXPLORATORY TESTS WITH UNUSUAL ROOD ID
+
+  @exploratoryRoomIds
+  Scenario Outline: Get room with unusual room id values
+    When user gets room with "<roomType>" id
+    Then response status code should be <status>
+
+    Examples:
+      | roomType | status |
+      | invalid  | 404 |
+      | negative | 404 |
 
 
 
-  @exploratory @booking
-  Scenario: Create booking with null values
-    When User creates booking with null values
-    Then Status code should be 400
+  # BOOKING STATE TESTS BY DELETING BOOKING TWICE
 
-
-
-  @exploratory @booking
-  Scenario: Create booking with empty JSON body
-    When User sends empty booking request
-    Then Status code should be 400
-
-
-
-  @exploratory @booking
-  Scenario: Create booking with invalid JSON structure
-    When User sends invalid booking JSON
-    Then Status code should be 400
-
-
-
-  @exploratory @room
-  Scenario: Get room with invalid ID
-    When User gets room with invalid id
-    Then Status code should be 404
-
-
-
-  @exploratory @room
-  Scenario: Get room with negative ID
-    When User gets room with negative id
-    Then Status code should be 400 or 404
-
-
-
-  @exploratory @booking
+  @exploratoryStateTest
   Scenario: Delete booking twice
-    Given User creates booking with valid data
-    When User deletes the booking
-    Then Status code should be 202
-    When User deletes the same booking again
-    Then Status code should be 404
+    Given user creates booking with valid data
+    When user deletes booking
+    Then response status code should be 201
+    When user deletes booking again
+    Then response status code should be 404
 
 
 
-  @exploratory @booking
-  Scenario: Update booking without authentication
-    Given User creates booking with valid data
-    When User updates booking without token
-    Then Status code should be 403
+  # SECURITY TESTS WITHOUT AUTHENTICATION
 
+  @exploratorySecurity
+  Scenario Outline: Booking operations without authentication
+    Given user creates booking with valid data
+    When user <operation> booking without authentication
+    Then response status code should be 403
 
-
-  @exploratory @booking
-  Scenario: Delete booking without authentication
-    Given User creates booking with valid data
-    When User deletes booking without token
-    Then Status code should be 403
+    Examples:
+      | operation |
+      | updates |
+      | deletes |

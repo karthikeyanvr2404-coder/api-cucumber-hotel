@@ -1,119 +1,124 @@
 Feature: Create Booking API
 
   As an API user
-  I want to create bookings for rooms
+  I want to create bookings
   So that rooms can be reserved
+
 
   Background:
     Given Booking API endpoint is available
     And request content type is "application/json"
 
-    #POSITIVE SCENARIOS
 
-  @regression
-  @positive
+  # POSITIVE SCENARIOS WITH VALID DETAILS
+
+  @regression @createBookingValid
   Scenario: Create booking with valid details
-    When  user creates booking with valid details
+    When user creates booking with valid details
     Then response status code should be 200
     And booking id should be generated
 
-  @positive @room
-  Scenario: Create booking for a valid room
-    When user creates booking for room "101"
+
+  @createBookingValidRoom @roomBooking
+  Scenario Outline: Create booking for valid rooms
+    When user creates booking for room "<room>"
     Then response status code should be 200
 
-  @positive @room
-  Scenario: Create booking for a different rooms
-    When user creates booking for room "102"
+    Examples:
+      | room |
+      | 101 |
+      | 102 |
+
+
+  # BOUNDARY TESTING WITH IN BOUNDARY NUMBERS
+
+  @boundaryTest @createBookingRoomBoundary
+  Scenario Outline: Create booking with boundary room numbers
+
+    When user creates booking for room "<room>"
     Then response status code should be 200
 
-    #ROOM BOUNDARY TESTS
-  @boundary @room
-    Scenario: Create booking with minimum room number
-    When user creates booking for room "1"
-    Then response status code should be 200
-
-  @boundary @room
-  Scenario: Create booking with maximum room number
-    When user creates booking for room "999"
-    Then response status code should be 200
+    Examples:
+      | room |
+      | 1    |
+      | 999  |
 
 
-    #ROOM NEGATIVE TESTS
+  # NEGATIVE SCENARIOS WITH INVALID ROOM NUMBERS
 
-  @negative @room
-    Scenario: Create booking with invalid room number
-    When user creates booking for room "ABC"
+  @createBookingInvalidRoom @validationError
+  Scenario Outline: Create booking with invalid room numbers
+    When user creates booking for room "<room>"
     Then response status code should be 400
-    And Error message should be "Invalid room number"
 
-  @negative @room
-  Scenario: Create booking with negative room number
-    When user creates booking for room "-1"
-    Then response status code should be 400
-    And Error message should be "Negative room number"
+    Examples:
+      | room |
+      | ABC  |
+      | -1   |
 
-  @negative @room
+
+  @createBookingEmptyRoom @validationError
   Scenario: Create booking with empty room
     When user creates booking with empty room
     Then response status code should be 400
-    And Error message should be "Empty Room"
+    And error message should be "Empty Room"
 
-    #ROOM ERROR VALIDATION
-  @errorValidation @room
-    Scenario: Validate invalid room error
+
+  # ERROR VALIDATION WITH INVALID ROOM
+
+  @createBookingErrorMessage
+  Scenario: Validate invalid room error message
+
     When user creates booking for room "ABC"
     Then response status code should be 400
     And error message should contain "room"
 
-    #ROOM SCHEMA VALIDATION
 
-  @schema @room
-    Scenario: Validate booking schema with room
-    When user creates booking for room "101"
+  # SCHEMA VALIDATION WITH VALID RESPONSE SCHEMA
+
+  @schemaValidation @createBookingSchema
+  Scenario: Validate booking response schema
+    When user creates booking with valid details
     Then response status code should be 200
     And response should match booking schema
 
-    #HEADER VALIDATION
+
+  # HEADER VALIDATION WITH CREATE BOOKING RESPONSE HEADERS
+
+  @headerValidation @createBookingHeaders
+  Scenario: Validate create booking response headers
+    When user creates booking with valid details
+    Then response header "Content-Type" should be "application/json"
 
 
-    @headers
-    Scenario: Validate response headers for create booking
-      When user creates booking with valid details
-      Then response header "Content-Type" should be "application/json"
+  # PERFORMANCE VALIDATION WITH CREATE BOOKING RESPONSE TIME
 
-   #RESPONSE TIME VALIDATION
+  @performance @createBookingPerformance
+  Scenario: Validate create booking response time
 
-    @performance
-    Scenario: Validate create booking response time
-      When user creates booking with valid details
-      Then response time should be less than 2000ms
-
-   #DATA INTEGRITY VALIDATION
-
-    @dataValidation
-
-    Scenario: Validate created booking data integrity
-      When user creates booking with valid details
-      Then response status code should be 200
-      And firstname should match request
-      And lastname should match request
-      And totalprice should match request
+    When user creates booking with valid details
+    Then response time should be less than 2000 ms
 
 
-  #CONTRACT VALIDATION
+  # DATA VALIDATION WITH CREATED BOOKING
 
-    @contract
+  @dataValidation @createBookingDataIntegrity
+  Scenario: Validate created booking data integrity
 
-    Scenario: Validate create booking response contract
-      When user creates booking with valid details
-      Then response should contain field "bookingid"
-      And response should contain field "booking.firstname"
-      And response should contain field "booking.lastname"
-      And response should contain field "booking.totalprice"
-
-
+    When user creates booking with valid details
+    Then response status code should be 200
+    And firstname should match request
+    And lastname should match request
+    And totalprice should match request
 
 
+  # CONTRACT VALIDATION WITH CREATE BOOKING RESPONSE
 
+  @contractValidation @createBookingContract
+  Scenario: Validate create booking response contract
 
+    When user creates booking with valid details
+    Then response should contain field "bookingid"
+    And response should contain field "booking.firstname"
+    And response should contain field "booking.lastname"
+    And response should contain field "booking.totalprice"
