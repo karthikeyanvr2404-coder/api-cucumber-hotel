@@ -5,6 +5,7 @@ Feature: Get Booking API
 
     #POSITIVE
 
+  @regression
   @positive
   Scenario: Get booking by name
     Given booking exists

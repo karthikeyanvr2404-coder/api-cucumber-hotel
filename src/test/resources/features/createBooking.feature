@@ -10,6 +10,7 @@ Feature: Create Booking API
 
     #POSITIVE SCENARIOS
 
+  @regression
   @positive
   Scenario: Create booking with valid details
     When  user creates booking with valid details
@@ -44,16 +45,19 @@ Feature: Create Booking API
     Scenario: Create booking with invalid room number
     When user creates booking for room "ABC"
     Then response status code should be 400
+    And Error message should be "Invalid room number"
 
   @negative @room
   Scenario: Create booking with negative room number
     When user creates booking for room "-1"
     Then response status code should be 400
+    And Error message should be "Negative room number"
 
   @negative @room
   Scenario: Create booking with empty room
     When user creates booking with empty room
     Then response status code should be 400
+    And Error message should be "Empty Room"
 
     #ROOM ERROR VALIDATION
   @errorValidation @room

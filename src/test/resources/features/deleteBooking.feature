@@ -5,7 +5,7 @@
       And booking exists
 
   #POSITIVE
-
+    @regression
     @positive
     Scenario: Delete booking successfully
       Given user is authenticated

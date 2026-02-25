@@ -10,7 +10,7 @@ Feature: Authentication API
 
 
   #POSITIVE SCENARIOS
-
+  @regression
   @positive @login
     Scenario: Login with valid credentials
       When user logs in with valid username and password

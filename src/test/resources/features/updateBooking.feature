@@ -7,7 +7,7 @@ Feature: Update Booking API
 
 
  #POSITIVE
-
+  @regression
   @positive
   Scenario: Update booking successfully
     Given user is authenticated
