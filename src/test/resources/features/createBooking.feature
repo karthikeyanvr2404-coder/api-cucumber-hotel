@@ -21,6 +21,18 @@ Feature: Create Booking API
     When user creates booking for room "101"
     Then response status code should be 200
   @positive @room
-  Scenario: Create booking for a valid room
+  Scenario: Create booking for a different rooms
     When user creates booking for room "102"
     Then response status code should be 200
+
+    #ROOM BOUNDARY TESTS
+  @boundary @room
+    Scenario: Create booking with minimum room number
+    When user creates booking for room "1"
+    Then response status code should be 200
+
+  @boundary @room
+  Scenario: Create booking with maximum room number
+    When user creates booking for room "999"
+    Then response status code should be 200
+
