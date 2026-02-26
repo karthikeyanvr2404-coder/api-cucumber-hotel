@@ -43,7 +43,7 @@ Feature: Create Booking API
   # NEGATIVE SCENARIOS WITH INVALID DATA
   @createBookingInvalidData @validationError
   Scenario Outline: Create booking with invalid data
-    When User creates booking with "<firstname>" "<lastname>" "<price>" "<deposit>" "<checkin>" "<checkout>"<needs>"
+    When User creates booking with "<firstname>" "<lastname>" "<price>" "<deposit>" "<checkin>" "<checkout>""<needs>"
     And the user gets "<error>" error message
     Then Response status should be <status>
     Examples:
