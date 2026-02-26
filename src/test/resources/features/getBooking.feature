@@ -49,7 +49,7 @@ Feature: Get Booking API
 
   # ERROR VALIDATION WITH NON EXISTING BOOKING
 
-  @@getBookingErrorMessage
+  @getBookingErrorMessage
   Scenario: Validate booking not found error
     When user gets booking with invalid id
     Then response status code should be 404
@@ -87,13 +87,21 @@ Feature: Get Booking API
   # DATA VALIDATION WITH BOOKING RESPONSE DATA
 
   @dataValidation @getBookingData
-  Scenario: Validate booking response data
+  Scenario Outline: Validate booking response data exist
     Given booking exists
     When user gets booking by id
-    Then response should contain field "firstname"
-    And response should contain field "lastname"
-    And response should contain field "totalprice"
-    And response should contain field "bookingdates"
+    Then response should contain field "<field>"
+
+    Examples:
+      | field        |
+      | firstname    |
+      | lastname     |
+      | price        |
+      | bookingdates |
+      | checkin      |
+      | checkout     |
+      | needs        |
+
 
 
   # CONTRACT VALIDATION WITH VALID BOOKING
@@ -104,5 +112,9 @@ Feature: Get Booking API
     When user gets booking by id
     Then response should contain field "firstname"
     And response should contain field "lastname"
-    And response should contain field "bookingdates.checkin"
-    And response should contain field "bookingdates.checkout"
+    And response should contain field "price"
+    And response should contain field "checkin"
+    And response should contain field "checkout"
+    And response should contain field "needs"
+    And response should contain field "status"
+

@@ -13,11 +13,17 @@ Feature: Create Booking API
   # POSITIVE SCENARIOS WITH VALID DETAILS
 
   @regression @createBookingValid
-  Scenario: Create booking with valid details
-    When user creates booking with valid details
-    Then response status code should be 200
-    And booking id should be generated
+  Scenario Outline: Create booking with valid data
+    When User creates booking with "<firstname>" "<lastname>" "<price>" "<deposit>" "<checkin>" "<checkout>""<needs>"
+    Then Response status should be 200
+    And Response should match booking schema
 
+    Examples:
+      | firstname | lastname | price | checkin    | checkout   | needs      |
+      | John      | Brown    | 100   | 2024-01-01 | 2024-01-05 | Breakfast  |
+      | Alice     | Smith    | 250   | 2024-02-01 | 2024-02-10 | Lunch      |
+      | Mark      | Lee      | 500   | 2024-03-01 | 2024-03-07 | Dinner     |
+      | Emma      | White    | 150   | 2024-04-01 | 2024-04-05 | None       |
 
   @createBookingValidRoom @roomBooking
   Scenario Outline: Create booking for valid rooms
@@ -44,7 +50,23 @@ Feature: Create Booking API
       | 999  |
 
 
-  # NEGATIVE SCENARIOS WITH INVALID ROOM NUMBERS
+  # NEGATIVE SCENARIOS WITH INVALID DATA
+
+  @createBookingInvalidData @validationError
+  Scenario Outline: Create booking with invalid data
+    When User creates booking with "<firstname>" "<lastname>" "<price>" "<deposit>" "<checkin>" "<checkout>"<needs>"
+    And the user gets "<error>" error message
+    Then Response status should be <status>
+
+    Examples:
+      | firstname | lastname | price | checkin    | checkout   | needs      | status |error|
+      |           | Brown    | 100   | 2024-01-01 | 2024-01-05 | Breakfast  | 200    |first name should not be blank |
+      | John      |   cc      | 100   | 2024-01-01 | 2024-01-05 | Breakfast  | 200    |size must be minimum 3 to 25  |
+      | John      | Brown    | 0     | 2024-01-01 | 2024-01-05 | Breakfast  | 200    |Price should not be zero price |
+      | John      | Brown    | -50   | 2024-01-01 | 2024-01-05 | Breakfast  | 200    |Price must not be negative     |
+      | John      | Brown    | 100   | invalid    | 2024-01-05 | Breakfast  | 200    |Invalid checkin date           |
+      | John      | Brown    | 100   | 2024-01-01 | invalid    | Breakfast  | 400    |Invalid checkout date          |
+
 
   @createBookingInvalidRoom @validationError
   Scenario Outline: Create booking with invalid room numbers
@@ -58,10 +80,18 @@ Feature: Create Booking API
 
 
   @createBookingEmptyRoom @validationError
-  Scenario: Create booking with empty room
-    When user creates booking with empty room
+  Scenario Outline: Create booking with empty room
+    When user creates booking with empty room <room>
     Then response status code should be 400
     And error message should be "Empty Room"
+    And user is unable to create a booking
+
+    Examples:
+      | room |
+      |      |
+      |      |
+
+
 
 
   # ERROR VALIDATION WITH INVALID ROOM

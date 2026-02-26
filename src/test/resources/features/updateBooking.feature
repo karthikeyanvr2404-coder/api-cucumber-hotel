@@ -8,10 +8,17 @@ Feature: Update Booking API
   # POSITIVE SCENARIOS FOR UPDATE VALID BOOKING AND ROOM
 
   @regression @updateBookingValid
-  Scenario: Update booking successfully
+  Scenario Outline: Update booking successfully
     Given user is authenticated
-    When user updates booking
+    When user updates booking <firstname>
     Then response status code should be 200
+
+    Examples:
+      | firstname |
+      | Abraham   |
+      | Alice steve   |
+      | John          |
+
 
 
   @updateBookingRoomValid
@@ -24,6 +31,7 @@ Feature: Update Booking API
       | room |
       | 101 |
       | 105 |
+      | 110  |
 
 
   # NEGATIVE SCENARIOS FOR INVALID BOOKING
@@ -38,17 +46,23 @@ Feature: Update Booking API
       | room |
       | ABC |
       | -1  |
+      | 0    |
+      | 9999 |
 
 
   # ERROR VALIDATION FOR INVALID ROOM UPDATE
 
   @updateBookingErrorMessage
-  Scenario: Validate invalid room update error
+  Scenario Outline: Validate invalid room update error
     Given user is authenticated
-    When user updates booking room to "ABC"
+    When user updates booking room to "<room>"
     Then response status code should be 400
     And error message should contain "room"
 
+    Examples:
+      | room |
+      | ABC  |
+      | -10  |
 
   # SCHEMA VALIDATION FOR UPDATE BOOKING SCHEMA
 
@@ -82,21 +96,36 @@ Feature: Update Booking API
   # DATA VALIDATION WITH UPDATED BOOKING DATA
 
   @dataValidation @updateBookingData
-  Scenario: Validate updated booking data
+  Scenario Outline: Validate updated booking data
     Given user is authenticated
-    When user updates booking
+    When user updates booking firstname to "<firstname>"
     Then firstname should match request
     And lastname should match request
     And totalprice should match request
+
+    Examples:
+      | firstname   |
+      | Michael     |
+      | Robert      |
+      | Anderson    |
+
+
 
 
   # CONTRACT VALIDATION WITH UPDATE BOOKING
 
   @contractValidation @updateBookingContract
-  Scenario: Validate update booking contract
-
+  Scenario Outline: Validate update booking contract
     Given user is authenticated
-    When user updates booking
-    Then response should contain field "firstname"
-    And response should contain field "lastname"
-    And response should contain field "totalprice"
+    When user updates booking with valid data
+    Then response should contain field "<field>"
+
+
+    Examples:
+      | field       |
+      | firstname   |
+      | lastname    |
+      | totalprice  |
+      | bookingdates|
+      | checkin     |
+      | checkout    |
