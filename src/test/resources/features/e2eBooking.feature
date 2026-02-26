@@ -13,23 +13,28 @@ Feature: End-to-End Booking Flow
   # COMPLETE BOOKING FLOW LIFECYCLE
 
   @regression @e2eLifecycle
-  Scenario: Complete booking lifecycle
+  Scenario Outline: Complete booking lifecycle
 
-    Given user logs in with valid username and password
+    Given user logs in with username "<username>" and password "<password>"
     And auth token should be generated
 
-    When user creates booking with valid details
+    When user creates booking with firstname "<firstname>" and lastname "<lastname>"
     Then response status code should be 200
     And booking id should be generated
 
     When user gets booking by id
     Then response status code should be 200
 
-    When user updates booking
+    When user updates booking firstname to "<updatedFirstname>"
     Then response status code should be 200
 
     When user deletes booking
     Then response status code should be 201
+
+    Examples:
+      | username | password | firstname | lastname | updatedFirstname |
+      | admin | password123 | John | Brown | Johnny |
+      | admin | password123 | Alice | Smith | Alicia |
 
 
 
@@ -38,7 +43,7 @@ Feature: End-to-End Booking Flow
   @e2eRoomLifecycle
   Scenario Outline: Complete booking lifecycle with room "<room>"
 
-    Given user logs in with valid username and password
+    Given user logs in with username "<username>" and password "<password>"
     And auth token should be generated
 
     When user creates booking for room "<room>"
@@ -54,18 +59,19 @@ Feature: End-to-End Booking Flow
     Then response status code should be 201
 
     Examples:
-      | room | updatedRoom |
-      | 101  | 105 |
-      | 102  | 110 |
+      | username | password | room | updatedRoom |
+      | admin | password123 | 101 | 105 |
+      | admin | password123 | 102 | 110 |
+      | admin | password123 | 1   | 2   |
 
 
 
   # NEGATIVE FLOW WITHOUT AUTHENTICATION
 
   @security @e2eUnauthorized
-  Scenario: Booking lifecycle without authentication
+  Scenario Outline: Booking lifecycle without authentication
 
-    When user creates booking with valid details
+    When user creates booking with firstname "<firstname>"
     Then response status code should be 200
 
     When user updates booking without authentication
@@ -74,12 +80,25 @@ Feature: End-to-End Booking Flow
     When user deletes booking without authentication
     Then response status code should be 403
 
+    Examples:
+      | firstname |
+      | John |
+      | Alice |
+      | Mark |
+
+
 
 
   # PERFORMANCE FLOW WITH VALID DETAILS
 
   @performance @e2ePerformance
-  Scenario: End-to-end booking performance
-    Given user logs in with valid username and password
-    When user creates booking with valid details
+  Scenario Outline: End-to-end booking performance
+    Given user logs in with username "<username>" and password "<password>"
+    When user creates booking with firstname "<firstname>"
     Then response time should be less than 2000 ms
+
+    Examples:
+      | username | password | firstname |
+      | admin | password123 | John |
+      | admin | password123 | Alice |
+      | admin | password123 | Mark |
